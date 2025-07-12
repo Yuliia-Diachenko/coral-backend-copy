@@ -12,8 +12,11 @@ export class RecaptchaService {
     private readonly configService: ConfigService,
   ) {
     this.secretKey = this.configService.get<string>('RECAPTCHA_SECRET');
+    console.log(
+      'Recaptcha secret key:',
+      this.secretKey ? 'Зчитано' : 'НЕ Зчитано',
+    );
   }
-
   async validate(token: string): Promise<boolean> {
     const url = `https://www.google.com/recaptcha/api/siteverify`;
 
@@ -22,7 +25,7 @@ export class RecaptchaService {
     params.append('response', token);
 
     const { data } = await firstValueFrom(this.httpService.post(url, params));
-
+    console.log('recaptcha response data:', data);
     if (!data.success) {
       throw new UnauthorizedException('reCAPTCHA validation failed');
     }

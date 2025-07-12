@@ -2,6 +2,7 @@ import {
   Injectable,
   ExecutionContext,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecaptchaService } from '../recaptcha/recaptcha.service';
@@ -15,15 +16,25 @@ export class LocalAuthGuard extends AuthGuard('local') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const recaptchaToken = request.body.recaptchaToken;
+    const recaptchaToken = request.body?.recaptchaToken;
 
     if (!recaptchaToken) {
       throw new UnauthorizedException('reCAPTCHA token is missing');
     }
 
-    await this.recaptchaService.validate(recaptchaToken);
+    try {
+      await this.recaptchaService.validate(recaptchaToken);
+    } catch (error) {
+      console.error('Recaptcha validation failed:', error);
+      throw new ForbiddenException('Invalid reCAPTCHA token');
+    }
 
-    // Next, we call the original LocalAuthGuard for login
-    return super.canActivate(context) as Promise<boolean>;
+    const can = (await super.canActivate(context)) as boolean;
+
+    if (!can) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return can;
   }
 }
