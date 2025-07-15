@@ -2,7 +2,7 @@ variables:
   GIT_DEPTH: 0
   BUILD_TAG_BASE: v1.0.${CI_PIPELINE_IID}${ENV}
   BACKEND_CONTAINER_NAME: coral-backend${ENV}
-  PORT: 3000
+  PORT: 5000
 
 .docker-cleanup:
   script:
