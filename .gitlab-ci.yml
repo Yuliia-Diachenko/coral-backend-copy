@@ -8,7 +8,7 @@ variables:
   script:
     - docker container prune --filter "until=168h" -f
     - docker image prune --filter "until=168h" -f
-    - docker volume prune --filter "until=168h" -f
+    - docker volume ls -f dangling=true
     - docker network prune -f
 
 .release:
