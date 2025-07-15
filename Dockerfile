@@ -24,5 +24,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY prisma ./prisma
 
 ENV NODE_ENV=production
+USER node
 
 CMD ["node", "dist/src/main.js"]

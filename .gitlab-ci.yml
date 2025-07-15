@@ -1,0 +1,33 @@
+variables:
+  GIT_DEPTH: 0
+  BUILD_TAG_BASE: v1.0.${CI_PIPELINE_IID}${ENV}
+  BACKEND_CONTAINER_NAME: coral-backend${ENV}
+  PORT: 3000
+
+.docker-cleanup:
+  script:
+    - docker container prune --filter "until=168h" -f
+    - docker image prune --filter "until=168h" -f
+    - docker volume prune --filter "until=168h" -f
+    - docker network prune -f
+
+.release:
+  script:
+    - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
+    - docker stop $BACKEND_CONTAINER_NAME || true
+    - docker rm $BACKEND_CONTAINER_NAME || true
+    - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} --env-file .env  $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
+
+Deploy-prod:
+  stage: deploy
+  only:
+    - main
+  tags:
+    - coral-prod
+  allow_failure: false
+  before_script:
+    - echo $ENV_BACK_PROD | base64 -d > .env
+  after_script:
+    - !reference [.docker-cleanup, script]
+  script:
+    - !reference [.release, script]
