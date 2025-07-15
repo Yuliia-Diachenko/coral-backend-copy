@@ -13,6 +13,7 @@ variables:
 
 .release:
   script:
+    - docker network inspect coral-network >/dev/null 2>&1 || docker network create coral-network
     - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
     - docker stop $BACKEND_CONTAINER_NAME || true
     - docker rm $BACKEND_CONTAINER_NAME || true
