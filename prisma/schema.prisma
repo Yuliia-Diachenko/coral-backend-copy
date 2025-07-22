@@ -8,17 +8,27 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  firstName String?
-  lastName  String?
-  role      Role     @default(PROVIDER)
-  createdAt DateTime @default(now())
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  password            String
+  firstName           String?
+  lastName            String?
+  role                Role                 @default(PROVIDER)
+  passwordResetTokens PasswordResetToken[]
+  createdAt           DateTime             @default(now())
 }
 
 enum Role {
   ADMIN
   PROVIDER
   PATIENT
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
