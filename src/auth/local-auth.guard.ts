@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RecaptchaService } from '../recaptcha/recaptcha.service';
+import { RecaptchaService } from '../common/recaptcha/recaptcha.service';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
