@@ -3,27 +3,40 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 console.log('Seed script starting...');
+
 async function main() {
-  console.log('Creating user...');
+  const emails = [
+    'zirkanew82@gmail.com',
+    'podolyak365@gmail.com',
+    'glebkirsenko@gmail.com',
+    'kobzar.anatolii.vl@gmail.com',
+  ];
 
   const hashedPassword = await bcrypt.hash('test1234', 10);
 
-  await prisma.user.create({
-    data: {
-      email: 'zirkanew82@gmail.com',
-      password: hashedPassword,
-      role: 'ADMIN',
-    },
-  });
+  for (const email of emails) {
+    console.log(`Creating user: ${email}...`);
 
-  console.log('User created!');
+    await prisma.user.upsert({
+      where: { email },
+      update: {}, // не змінюємо, якщо вже є
+      create: {
+        email,
+        password: hashedPassword,
+        role: 'ADMIN',
+      },
+    });
+
+    console.log(`User ${email} created or already exists`);
+  }
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
+    console.log('Seed finished.');
   });

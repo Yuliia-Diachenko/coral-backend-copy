@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -13,7 +17,11 @@ export class UserService {
   // Create user with role-based restrictions
   async create(data: CreateUserDto, requesterRole: Role) {
     // Providers can create only PATIENT users
-    if (requesterRole === Role.PROVIDER && data.role && data.role !== Role.PATIENT) {
+    if (
+      requesterRole === Role.PROVIDER &&
+      data.role &&
+      data.role !== Role.PATIENT
+    ) {
       throw new ForbiddenException('Providers can only create patients');
     }
 
