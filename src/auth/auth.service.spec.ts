@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
@@ -12,6 +13,7 @@ describe('AuthService', () => {
         AuthService,
         PrismaService, // needed because AuthService injects PrismaService
         JwtService, // needed because AuthService injects JwtService
+        MailService,
       ],
     }).compile();
 
