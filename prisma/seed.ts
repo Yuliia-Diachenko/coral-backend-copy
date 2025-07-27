@@ -1,46 +1,42 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-console.log('Start seed');
-
 const prisma = new PrismaClient();
+console.log('Seed script starting...');
 
 async function main() {
-  const password = await bcrypt.hash('password123', 10);
+  const emails = [
+    'zirkanew82@gmail.com',
+    'podolyak365@gmail.com',
+    'glebkirsenko@gmail.com',
+    'kobzar.anatolii.vl@gmail.com',
+  ];
 
-  await prisma.user.createMany({
-    data: [
-      {
-        email: 'admin@example.com',
-        password,
+  const hashedPassword = await bcrypt.hash('test1234', 10);
+
+  for (const email of emails) {
+    console.log(`Creating user: ${email}...`);
+
+    await prisma.user.upsert({
+      where: { email },
+      update: {}, // не змінюємо, якщо вже є
+      create: {
+        email,
+        password: hashedPassword,
         role: 'ADMIN',
-        firstName: 'Alice',
-        lastName: 'Admin',
       },
-      {
-        email: 'provider@example.com',
-        password,
-        role: 'PROVIDER',
-        firstName: 'Bob',
-        lastName: 'Provider',
-      },
-      {
-        email: 'patient@example.com',
-        password,
-        role: 'PATIENT',
-        firstName: 'Charlie',
-        lastName: 'Patient',
-      },
-    ],
-    skipDuplicates: true,
-  });
+    });
+
+    console.log(`User ${email} created or already exists`);
+  }
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
+    console.log('Seed finished.');
   });

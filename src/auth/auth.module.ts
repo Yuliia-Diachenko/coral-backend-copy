@@ -5,8 +5,9 @@ import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
-import { RecaptchaModule } from '../recaptcha/recaptcha.module';
+import { RecaptchaModule } from '../common/recaptcha/recaptcha.module';
 import { LocalAuthGuard } from './local-auth.guard';
+import { MailService } from '../mail/mail.service';
 
 @Module({
   imports: [
@@ -17,7 +18,13 @@ import { LocalAuthGuard } from './local-auth.guard';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, LocalAuthGuard],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    LocalAuthGuard,
+    MailService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}
