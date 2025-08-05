@@ -15,6 +15,7 @@ model User {
   lastName            String?
   role                Role                 @default(PROVIDER)
   passwordResetTokens PasswordResetToken[]
+  notifications       Notification[]    
   createdAt           DateTime             @default(now())
 }
 
@@ -31,4 +32,21 @@ model PasswordResetToken {
   userId    String
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  read      Boolean  @default(false)
+  type      NotificationType @default(GENERAL)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+enum NotificationType {
+  GENERAL
+  INFO
+  WARNING
+  ERROR
 }
