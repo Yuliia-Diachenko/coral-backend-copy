@@ -13,19 +13,17 @@ describe('AppController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      // 📨 Мок поштового сервісу
+
       .overrideProvider(MailService)
       .useValue({
         sendPasswordResetEmail: jest.fn().mockResolvedValue(true),
       })
 
-      // 🔐 Мок reCAPTCHA сервісу
       .overrideProvider(RecaptchaService)
       .useValue({
         validate: jest.fn().mockResolvedValue(true),
       })
 
-      // 🛢 Мок бази даних
       .overrideProvider(PrismaService)
       .useValue({
         user: {
@@ -33,7 +31,6 @@ describe('AppController (e2e)', () => {
           create: jest.fn(),
           update: jest.fn(),
         },
-        // додай інші сутності при потребі
       })
 
       .compile();
@@ -50,6 +47,6 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('Backend is working! 🚀');
   });
 });

@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { MailService } from './mail/mail.service';
     UserModule,
     PrismaModule,
     AuthModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [MailService],
