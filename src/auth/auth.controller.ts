@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
   Req,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
@@ -25,7 +26,6 @@ export class AuthController {
         'Access is allowed only to providers, admins or patients',
       );
     }
-
     return this.authService.login(user);
   }
 
@@ -39,5 +39,10 @@ export class AuthController {
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.token, dto.newPassword);
     return { message: 'Password has been reset successfully.' };
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('logout')
+  async logout() {
+    return { message: 'Logged out successfully' };
   }
 }
