@@ -14,9 +14,50 @@ model User {
   firstName           String?
   lastName            String?
   role                Role                 @default(PROVIDER)
-  passwordResetTokens PasswordResetToken[]
-  notifications       Notification[]    
   createdAt           DateTime             @default(now())
+  notifications       Notification[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  message   String
+  read      Boolean          @default(false)
+  type      NotificationType @default(GENERAL)
+  userId    String
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id            String     @id @default(cuid())
+  name          String
+  brand         String
+  price         Decimal    @db.Decimal(10, 2)
+  discountPrice Decimal?   @db.Decimal(10, 2)
+  imageUrl      String?
+  description   String?
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  quantities    Quantity[]
+}
+
+model Quantity {
+  id        String  @id @default(cuid())
+  label     String
+  value     Int
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 enum Role {
@@ -25,28 +66,10 @@ enum Role {
   PATIENT
 }
 
-model PasswordResetToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-}
-
-model Notification {
-  id        String   @id @default(uuid())
-  message   String
-  read      Boolean  @default(false)
-  type      NotificationType @default(GENERAL)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  createdAt DateTime @default(now())
-}
-
 enum NotificationType {
-  GENERAL
+  GENERAL 
   INFO
   WARNING
   ERROR
 }
+// update file
