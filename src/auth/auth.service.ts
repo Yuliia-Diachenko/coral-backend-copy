@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import * as dayjs from 'dayjs';
 import { MailService } from '../mail/mail.service';
 
 @Injectable()
@@ -14,6 +13,7 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
+  // Перевірка логіну
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -37,19 +37,62 @@ export class AuthService {
     return result;
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.id, role: user.role };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  async loginWithRefresh(user: any) {
+    const accessToken = this.jwtService.sign(
+      { sub: user.id, role: user.role },
+      { expiresIn: '15m' },
+    );
+
+    const refreshToken = this.jwtService.sign(
+      { sub: user.id },
+      { expiresIn: '30d' },
+    );
+
+    // Upsert refresh token at database
+    await this.prisma.refreshToken.upsert({
+      where: { userId: user.id },
+      update: { token: refreshToken },
+      create: { userId: user.id, token: refreshToken },
+    });
+
+    return { accessToken, refreshToken };
   }
 
+  // Renew access token & refresh token
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const payload: any = this.jwtService.verify(refreshToken);
+      const stored = await this.prisma.refreshToken.findUnique({
+        where: { userId: payload.sub },
+      });
+
+      if (!stored || stored.token !== refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const newAccessToken = this.jwtService.sign(
+        { sub: payload.sub },
+        { expiresIn: '15m' },
+      );
+
+      return { accessToken: newAccessToken };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+  }
+
+  async logout(userId: string) {
+    await this.prisma.refreshToken.deleteMany({ where: { userId } });
+    return { message: 'Logged out successfully' };
+  }
+
+  // === reset password ===
   async requestPasswordReset(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) return;
 
     const token = uuidv4();
-    const expires = dayjs().add(1, 'hour').toDate();
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await this.prisma.passwordResetToken.create({
       data: {
@@ -61,7 +104,6 @@ export class AuthService {
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-    //for dev only
     if (process.env.NODE_ENV === 'development') {
       console.log('🔐 Password reset link:', resetLink);
     }
