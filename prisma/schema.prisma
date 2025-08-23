@@ -17,7 +17,6 @@ model User {
   createdAt           DateTime             @default(now())
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
-  refreshToken        RefreshToken?
 }
 
 model PasswordResetToken {
@@ -68,16 +67,9 @@ enum Role {
 }
 
 enum NotificationType {
-  GENERAL
+  GENERAL 
   INFO
   WARNING
   ERROR
 }
-
 // update file
-model RefreshToken {
-  id     String @id @default(uuid())
-  token  String
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
-}
