@@ -29,48 +29,18 @@ export class AuthController {
       );
     }
 
-    // Генеруємо access + refresh токени
-    const { accessToken, refreshToken } =
-      await this.authService.loginWithRefresh(user);
+    const { accessToken } = await this.authService.login(user);
 
-    // Встановлюємо HttpOnly cookie
+    //  HttpOnly cookie
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       domain: '.coralscript.com',
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000, // 15 хвилин
-    });
-
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      domain: '.coralscript.com',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
+      maxAge: 15 * 60 * 1000, // 15 min
     });
 
     return { role: user.role };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('refresh')
-  async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies?.refresh_token;
-    if (!refreshToken) throw new UnauthorizedException('Refresh token missing');
-
-    const newAccessToken =
-      await this.authService.refreshAccessToken(refreshToken);
-
-    res.cookie('access_token', newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      domain: '.coralscript.com',
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000,
-    });
-
-    return { message: 'Access token refreshed' };
   }
 
   @Post('request-password-reset')
@@ -89,8 +59,6 @@ export class AuthController {
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
-
     return { message: 'Logged out successfully' };
   }
 }
