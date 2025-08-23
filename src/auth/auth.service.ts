@@ -13,7 +13,6 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
-  // Перевірка логіну
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -37,53 +36,13 @@ export class AuthService {
     return result;
   }
 
-  async loginWithRefresh(user: any) {
+  async login(user: any) {
     const accessToken = this.jwtService.sign(
       { sub: user.id, role: user.role },
       { expiresIn: '15m' },
     );
 
-    const refreshToken = this.jwtService.sign(
-      { sub: user.id },
-      { expiresIn: '30d' },
-    );
-
-    // Upsert refresh token at database
-    await this.prisma.refreshToken.upsert({
-      where: { userId: user.id },
-      update: { token: refreshToken },
-      create: { userId: user.id, token: refreshToken },
-    });
-
-    return { accessToken, refreshToken };
-  }
-
-  // Renew access token & refresh token
-  async refreshAccessToken(refreshToken: string) {
-    try {
-      const payload: any = this.jwtService.verify(refreshToken);
-      const stored = await this.prisma.refreshToken.findUnique({
-        where: { userId: payload.sub },
-      });
-
-      if (!stored || stored.token !== refreshToken) {
-        throw new UnauthorizedException('Invalid refresh token');
-      }
-
-      const newAccessToken = this.jwtService.sign(
-        { sub: payload.sub },
-        { expiresIn: '15m' },
-      );
-
-      return { accessToken: newAccessToken };
-    } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
-  }
-
-  async logout(userId: string) {
-    await this.prisma.refreshToken.deleteMany({ where: { userId } });
-    return { message: 'Logged out successfully' };
+    return { accessToken };
   }
 
   // === reset password ===
