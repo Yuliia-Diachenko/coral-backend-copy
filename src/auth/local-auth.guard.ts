@@ -15,7 +15,6 @@ export class LocalAuthGuard extends AuthGuard('local') {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-
     const recaptchaToken = request.body?.recaptchaToken;
 
     if (!recaptchaToken) {
@@ -25,16 +24,19 @@ export class LocalAuthGuard extends AuthGuard('local') {
     try {
       await this.recaptchaService.validate(recaptchaToken);
     } catch (error) {
-      console.error('Recaptcha validation failed:', error);
+      console.error('Recaptcha validation failed:', error?.message || error);
       throw new ForbiddenException('Invalid reCAPTCHA token');
     }
 
-    const can = (await super.canActivate(context)) as boolean;
-
-    if (!can) {
-      throw new UnauthorizedException('Invalid credentials');
+    try {
+      const can = (await super.canActivate(context)) as boolean;
+      if (!can) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+      return can;
+    } catch (err) {
+      console.error('LocalAuthGuard error:', err?.message || err);
+      throw new UnauthorizedException('Invalid email or password');
     }
-
-    return can;
   }
 }
