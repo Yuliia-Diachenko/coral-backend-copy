@@ -14,19 +14,29 @@ export class RecaptchaService {
     this.secretKey = this.configService.get<string>('RECAPTCHA_SECRET');
     console.log('Using reCAPTCHA secret:', this.secretKey);
   }
+
   async validate(token: string): Promise<boolean> {
-    const url = `https://www.google.com/recaptcha/api/siteverify`;
-
-    const params = new URLSearchParams();
-    params.append('secret', this.secretKey);
-    params.append('response', token);
-
-    const { data } = await firstValueFrom(this.httpService.post(url, params));
-    console.log('recaptcha response data:', data);
-    if (!data.success) {
-      throw new UnauthorizedException('reCAPTCHA validation failed');
+    if (!token) {
+      throw new UnauthorizedException('reCAPTCHA token missing');
     }
 
-    return true;
+    try {
+      const url = `https://www.google.com/recaptcha/api/siteverify`;
+      const params = new URLSearchParams();
+      params.append('secret', this.secretKey);
+      params.append('response', token);
+
+      const { data } = await firstValueFrom(this.httpService.post(url, params));
+      console.log('recaptcha response data:', data);
+
+      if (!data.success) {
+        throw new UnauthorizedException('reCAPTCHA validation failed');
+      }
+
+      return true;
+    } catch (err) {
+      console.error('reCAPTCHA verification error:', err);
+      throw new UnauthorizedException('Failed to verify reCAPTCHA');
+    }
   }
 }
