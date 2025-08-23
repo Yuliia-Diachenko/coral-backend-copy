@@ -12,6 +12,7 @@ export class RecaptchaService {
     private readonly configService: ConfigService,
   ) {
     this.secretKey = this.configService.get<string>('RECAPTCHA_SECRET');
+    console.log('Using reCAPTCHA secret:', this.secretKey);
   }
   async validate(token: string): Promise<boolean> {
     const url = `https://www.google.com/recaptcha/api/siteverify`;
