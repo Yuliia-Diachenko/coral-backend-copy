@@ -1,3 +1,4 @@
+// auth.controller.ts
 import {
   Controller,
   Post,
@@ -7,11 +8,11 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { Response } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
@@ -31,7 +32,6 @@ export class AuthController {
 
     const { accessToken } = await this.authService.login(user);
 
-    //  HttpOnly cookie
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -40,7 +40,7 @@ export class AuthController {
       maxAge: 15 * 60 * 1000, // 15 min
     });
 
-    return { role: user.role };
+    return { role: user.role, accessToken };
   }
 
   @Post('request-password-reset')
