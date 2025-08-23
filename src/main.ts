@@ -1,7 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,11 +10,10 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://coral-frontend-u7qi.vercel.app',
       'https://coralscript.com',
-      'https://coralscript.com/provider-account',
     ],
     credentials: true,
   });
-  app.use(cookieParser());
+
   const port = process.env.PORT || 5000;
   await app.listen(port, '0.0.0.0');
 }
