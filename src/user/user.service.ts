@@ -42,21 +42,26 @@ export class UserService {
     const where: Prisma.UserWhereInput = {};
 
     if (requesterRole === Role.PROVIDER) {
-      // Providers can only see patients, ignore role filter if any
-      where.role = Role.PATIENT;
-    } else if (filter.role) {
-      where.role = filter.role;
+      // Provider sees all patients and all providers
+      if (filter.role === Role.PATIENT || filter.role === Role.PROVIDER) {
+        where.role = filter.role;
+      } else {
+        // If role is not specified, we see patients + providers
+        where.OR = [{ role: Role.PATIENT }, { role: Role.PROVIDER }];
+      }
+    } else if (requesterRole === Role.ADMIN) {
+      // Admin sees everything
+      if (filter.role) {
+        where.role = filter.role;
+      }
     }
 
-    if (filter.email) {
+    if (filter.email)
       where.email = { contains: filter.email, mode: 'insensitive' };
-    }
-    if (filter.firstName) {
+    if (filter.firstName)
       where.firstName = { contains: filter.firstName, mode: 'insensitive' };
-    }
-    if (filter.lastName) {
+    if (filter.lastName)
       where.lastName = { contains: filter.lastName, mode: 'insensitive' };
-    }
 
     return this.prisma.user.findMany({ where });
   }
