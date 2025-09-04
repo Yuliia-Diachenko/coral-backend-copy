@@ -12,9 +12,11 @@ export class PatientsService {
   ) {}
 
   async createPatient(dto: CreatePatientDto) {
+    // Step 1: generate temporary password
     const tempPassword = Math.random().toString(36).slice(-8);
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
+    // Step 2: create patient in database
     const patient = await this.prisma.user.create({
       data: {
         email: dto.email,
@@ -29,7 +31,10 @@ export class PatientsService {
       },
     });
 
-    await this.postmark.sendPatientInvite(dto.email, tempPassword);
+    // Step 3: send email only if inviteOption === 'invite'
+    if (dto.inviteOption === 'invite') {
+      await this.postmark.sendPatientInvite(dto.email, tempPassword);
+    }
 
     return { id: patient.id, email: patient.email };
   }
