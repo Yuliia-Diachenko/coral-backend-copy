@@ -22,4 +22,5 @@ export class CreatePatientDto {
 
   @IsOptional()
   discount?: number;
+  inviteOption?: 'invite' | 'noEmail';
 }
