@@ -12,6 +12,7 @@ async function bootstrap() {
       'https://coral-frontend-u7qi.vercel.app',
       'https://coralscript.com',
       'https://coralscript.com/provider-account',
+      'http://localhost:3000/provider-account/',
     ],
     credentials: true,
   });
