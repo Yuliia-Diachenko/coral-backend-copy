@@ -16,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFilterDto } from './dto/user-filter.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
+import { BackendApiGuard } from '../common/guards/backend-api.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
 
@@ -48,5 +49,20 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
     return this.userService.remove(id, req.user.role);
+  }
+}
+@Controller('internal/users')
+@UseGuards(BackendApiGuard)
+export class InternalUserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get()
+  async findAllInternal(@Query() filter: UserFilterDto) {
+    return this.userService.findAll(filter, 'ADMIN');
+  }
+
+  @Post()
+  async createInternal(@Body() dto: CreateUserDto) {
+    return this.userService.create(dto, 'ADMIN');
   }
 }
