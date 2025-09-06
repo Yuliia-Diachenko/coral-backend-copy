@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
 import { NotificationsModule } from './notifications/notifications.module';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PrismaModule,
     AuthModule,
     NotificationsModule,
+    LoggingModule,
   ],
   controllers: [AppController],
   providers: [MailService],

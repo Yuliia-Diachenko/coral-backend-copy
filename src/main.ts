@@ -3,8 +3,59 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 
+import {
+  WinstonModule,
+  utilities as nestWinstonModuleUtilities,
+} from 'nest-winston';
+import * as winston from 'winston';
+import 'winston-daily-rotate-file';
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = WinstonModule.createLogger({
+    exitOnError: false,
+    handleExceptions: true,
+    transports: [
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          nestWinstonModuleUtilities.format.nestLike('Coralscript api', {
+            appName: true,
+            prettyPrint: true,
+            colors: true,
+          }),
+        ),
+      }),
+      new winston.transports.DailyRotateFile({
+        dirname: process.env.APP_LOGS_DIR_PATH,
+        filename: 'application-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json(),
+        ),
+      }),
+      new winston.transports.DailyRotateFile({
+        dirname: `${process.env.APP_LOGS_DIR_PATH}/errors`,
+        level: 'error',
+        filename: 'error-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '60d',
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.prettyPrint(),
+        ),
+      }),
+    ],
+  });
+
+  const app = await NestFactory.create(AppModule, { logger });
+
+  // const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: [
