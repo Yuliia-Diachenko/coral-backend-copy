@@ -10,15 +10,15 @@ export class CreatePatientDto {
   @IsString()
   lastName: string;
 
-  @IsOptional()
-  @IsString()
-  phone?: string;
+  // @IsOptional()
+  // @IsString()
+  // phone?: string;
 
-  @IsOptional()
-  dateOfBirth?: string;
+  // @IsOptional()
+  // dateOfBirth?: string;
 
-  @IsOptional()
-  gender?: string;
+  // @IsOptional()
+  // gender?: string;
 
   @IsOptional()
   discount?: number;
