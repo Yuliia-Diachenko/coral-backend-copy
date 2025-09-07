@@ -3,6 +3,7 @@ variables:
   BUILD_TAG_BASE: v1.0.${CI_PIPELINE_IID}${ENV}
   BACKEND_CONTAINER_NAME: coral-backend${ENV}
   PORT: 3000
+  LOG_PATH: '/opt/coral/logs'
 
 .docker-cleanup:
   script:
@@ -13,7 +14,7 @@ variables:
     - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
     - docker stop $BACKEND_CONTAINER_NAME || true
     - docker rm $BACKEND_CONTAINER_NAME || true
-    - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} --env-file .env  $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
+    - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} -v ${LOG_PATH}:/var/log/app/:rw --env-file .env  $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
 
 Deploy-prod:
   stage: deploy
