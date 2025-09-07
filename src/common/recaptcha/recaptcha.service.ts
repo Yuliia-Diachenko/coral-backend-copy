@@ -16,26 +16,36 @@ export class RecaptchaService {
   }
 
   async validate(token: string): Promise<boolean> {
-    if (!token) {
-      throw new UnauthorizedException('reCAPTCHA token missing');
-    }
+    if (!token) throw new UnauthorizedException('reCAPTCHA token missing');
 
     try {
-      const url = `https://www.google.com/recaptcha/api/siteverify`;
+      const url = 'https://www.google.com/recaptcha/api/siteverify';
       const params = new URLSearchParams();
       params.append('secret', this.secretKey);
       params.append('response', token);
+      const { data } = await firstValueFrom(
+        this.httpService.post(url, params.toString(), {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          timeout: 6000,
+        }),
+      );
 
-      const { data } = await firstValueFrom(this.httpService.post(url, params));
-      console.log('recaptcha response data:', data);
+      console.log('reCAPTCHA verify payload:', {
+        success: data?.success,
+        'error-codes': data?.['error-codes'],
+        hostname: data?.hostname,
+        score: data?.score,
+        action: data?.action,
+      });
 
-      if (!data.success) {
-        throw new UnauthorizedException('reCAPTCHA validation failed');
+      if (!data?.success || data?.hostname !== 'coralscript.com') {
+        throw new UnauthorizedException(
+          `reCAPTCHA failed: ${(data?.['error-codes'] || []).join(',') || 'unknown'}`,
+        );
       }
-
       return true;
     } catch (err) {
-      console.error('reCAPTCHA verification error:', err);
+      console.error('reCAPTCHA verification error:', err?.message || err);
       throw new UnauthorizedException('Failed to verify reCAPTCHA');
     }
   }
