@@ -1,3 +1,35 @@
+# variables:
+#   GIT_DEPTH: 0
+#   BUILD_TAG_BASE: v1.0.${CI_PIPELINE_IID}${ENV}
+#   BACKEND_CONTAINER_NAME: coral-backend${ENV}
+#   PORT: 3000
+#   LOG_PATH: '/opt/coral/logs'
+
+# .docker-cleanup:
+#   script:
+#     - docker system prune -af
+
+# .release:
+#   script:
+#     - docker network inspect coral-network >/dev/null 2>&1 || docker network create coral-network
+#     - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
+#     - docker stop $BACKEND_CONTAINER_NAME || true
+#     - docker rm $BACKEND_CONTAINER_NAME || true
+#     - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} -v ${LOG_PATH}:/var/log/app/:rw --env-file .env  $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
+
+# Deploy-prod:
+#   stage: deploy
+#   only:
+#     - main
+#   tags:
+#     - coral-prod
+#   allow_failure: false
+#   before_script:
+#     - echo $ENV_BACK_PROD | base64 -d > .env
+#     - !reference [.docker-cleanup, script]
+#   script:
+#     - !reference [.release, script]
+
 variables:
   GIT_DEPTH: 0
   BUILD_TAG_BASE: v1.0.${CI_PIPELINE_IID}${ENV}
@@ -12,10 +44,20 @@ variables:
 .release:
   script:
     - docker network inspect coral-network >/dev/null 2>&1 || docker network create coral-network
-    - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
+    - echo "Freeing host port ${PORT}..."
+    - docker ps -q --filter "publish=${PORT}" | xargs -r docker stop
+    - docker ps -aq --filter "publish=${PORT}" | xargs -r docker rm
     - docker stop $BACKEND_CONTAINER_NAME || true
     - docker rm $BACKEND_CONTAINER_NAME || true
-    - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} -v ${LOG_PATH}:/var/log/app/:rw --env-file .env  $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
+    - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
+    - docker run -d \
+        -p 127.0.0.1:${PORT}:3000 \
+        --network coral-network \
+        --restart always \
+        --name ${BACKEND_CONTAINER_NAME} \
+        -v ${LOG_PATH}:/var/log/app/:rw \
+        --env-file .env \
+        $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
 
 Deploy-prod:
   stage: deploy
