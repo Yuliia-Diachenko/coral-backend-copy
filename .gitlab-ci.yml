@@ -50,14 +50,7 @@ variables:
     - docker stop $BACKEND_CONTAINER_NAME || true
     - docker rm $BACKEND_CONTAINER_NAME || true
     - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
-    - docker run -d \
-        -p 127.0.0.1:${PORT}:3000 \
-        --network coral-network \
-        --restart always \
-        --name ${BACKEND_CONTAINER_NAME} \
-        -v ${LOG_PATH}:/var/log/app/:rw \
-        --env-file .env \
-        $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
+    - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} -v ${LOG_PATH}:/var/log/app/:rw --env-file .env $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
 
 Deploy-prod:
   stage: deploy
