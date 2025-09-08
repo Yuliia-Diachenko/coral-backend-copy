@@ -21,4 +21,4 @@ npx node prisma/seed.ts
 npx prisma studio
 
 <!-- Logs -->
-https://coralscript.com/api/log-access/logs/errors/download/error-2025-09-07.log
+https://coralscript.com/api/var/log/app/download/error-2025-09-08.log
