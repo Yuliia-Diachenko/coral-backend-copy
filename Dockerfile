@@ -15,7 +15,6 @@ RUN npm run build
 FROM node:20-alpine
 
 WORKDIR /app
-RUN mkdir -p /var/log/app && chown -R node:node /var/log/app
 
 COPY package*.json ./
 RUN npm install --omit=dev
