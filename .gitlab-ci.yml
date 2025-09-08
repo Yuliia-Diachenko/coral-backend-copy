@@ -15,7 +15,8 @@ variables:
     - docker stop $BACKEND_CONTAINER_NAME || true
     - docker rm $BACKEND_CONTAINER_NAME || true
     - mkdir -p ${LOG_PATH}
-    - chown 1000:1000 ${LOG_PATH} || true
+    - docker run --rm -u 0 -v ${LOG_PATH}:/var/log/app alpine \
+      sh -lc "mkdir -p /var/log/app && chown -R 1000:1000 /var/log/app && chmod -R 775 /var/log/app"
     - docker run -d -p 127.0.0.1:${PORT}:3000 --network coral-network --restart always --name ${BACKEND_CONTAINER_NAME} -v ${LOG_PATH}:/var/log/app/:rw --env-file .env  $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE
 
 Deploy-prod:
