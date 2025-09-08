@@ -22,7 +22,8 @@ services:
       NODE_ENV: production
     ports:
       - "3000:3000"
-    command: node dist/src/main.js
+    command: node dist/main
 
 volumes:
   coral-db-data:
+
