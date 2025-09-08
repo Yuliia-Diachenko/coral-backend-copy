@@ -24,6 +24,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY prisma ./prisma
 
 ENV NODE_ENV=production
+ENV APP_LOGS_DIR_PATH=/var/log/app
 USER node
 
 CMD ["node", "dist/src/main.js"]
