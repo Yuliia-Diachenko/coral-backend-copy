@@ -26,3 +26,4 @@ services:
 
 volumes:
   coral-db-data:
+
