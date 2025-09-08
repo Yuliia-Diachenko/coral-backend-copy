@@ -38,7 +38,7 @@ async function bootstrap() {
         ),
       }),
       new winston.transports.DailyRotateFile({
-        dirname: `${process.env.APP_LOGS_DIR_PATH}/errors`,
+        dirname: `${process.env.APP_LOGS_DIR_PATH}`,
         level: 'error',
         filename: 'error-%DATE%.log',
         datePattern: 'YYYY-MM-DD',
