@@ -1,31 +1,51 @@
-# Stage 1: Builder
-FROM node:20-alpine AS builder
+# # Stage 1: Builder
+# FROM node:20-alpine AS builder
 
-WORKDIR /app
+# WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# COPY package*.json ./
+# RUN npm install
 
-COPY . .
+# COPY . .
 
-RUN npx prisma generate
-RUN npm run build
+# RUN npx prisma generate
+# RUN npm run build
 
-# Stage 2: Production
+# # Stage 2: Production
+# FROM node:20-alpine
+
+# WORKDIR /app
+
+# COPY package*.json ./
+# RUN npm install --omit=dev
+
+# COPY --from=builder /app/dist ./dist
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY prisma ./prisma
+
+# ENV NODE_ENV=production
+# USER node
+
+# CMD ["node", "dist/src/main.js"]
+
 FROM node:20-alpine
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --omit=dev
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY prisma ./prisma
+COPY . .
 
-ENV NODE_ENV=production
-ENV APP_LOGS_DIR_PATH=/var/log/app/
-USER node
+RUN npm install --immutable
+
+RUN npx prisma generate
+
+EXPOSE 3000
+
+RUN npm run build
 
 CMD ["node", "dist/src/main.js"]
+
+
+
 

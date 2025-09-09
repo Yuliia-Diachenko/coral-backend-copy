@@ -18,7 +18,7 @@ async function bootstrap() {
       new winston.transports.Console({
         format: winston.format.combine(
           winston.format.timestamp(),
-          nestWinstonModuleUtilities.format.nestLike('Coralscript api', {
+          nestWinstonModuleUtilities.format.nestLike('Coral api', {
             appName: true,
             prettyPrint: true,
             colors: true,
@@ -37,8 +37,9 @@ async function bootstrap() {
           winston.format.json(),
         ),
       }),
+      ,
       new winston.transports.DailyRotateFile({
-        dirname: `${process.env.APP_LOGS_DIR_PATH}`,
+        dirname: `${process.env.APP_LOGS_DIR_PATH}/errors`,
         level: 'error',
         filename: 'error-%DATE%.log',
         datePattern: 'YYYY-MM-DD',
@@ -53,7 +54,10 @@ async function bootstrap() {
     ],
   });
 
-  const app = await NestFactory.create(AppModule, { logger });
+  const app = await NestFactory.create(AppModule, {
+    logger,
+  });
+
 
   // const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
