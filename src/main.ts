@@ -58,8 +58,6 @@ async function bootstrap() {
     logger,
   });
 
-
-  // const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: [
