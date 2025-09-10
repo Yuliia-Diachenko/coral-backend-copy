@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -7,11 +7,14 @@ import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
+  logger: Logger;
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private mailService: MailService,
-  ) {}
+  ) {
+    this.logger = new Logger('Auth LOGGER');
+  }
 
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({
@@ -64,7 +67,7 @@ export class AuthService {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔐 Password reset link:', resetLink);
+      this.logger.log('🔐 Password reset link:', resetLink);
     }
 
     await this.mailService.sendPasswordResetEmail(email, resetLink);
