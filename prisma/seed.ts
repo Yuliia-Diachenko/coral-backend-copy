@@ -1,10 +1,13 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
+import { Logger } from '@nestjs/common';
+
 const prisma = new PrismaClient();
+const logger = new Logger('Prisma LOGGER');
 
 async function main() {
-  console.log('Seeding users and products...');
+  logger.log('Seeding users and products...');
 
   const hashedPassword = await bcrypt.hash('test1234', 10);
 
@@ -32,7 +35,7 @@ async function main() {
         role: u.role as any,
       },
     });
-    console.log(`User ${u.email} created or exists`);
+    logger.log(`User ${u.email} created or exists`);
   }
 
   // --- PRODUCTS ---
@@ -163,18 +166,18 @@ async function main() {
         },
       },
     });
-    console.log(`Product ${createdProduct.name} created`);
+    logger.log(`Product ${createdProduct.name} created`);
   }
 }
 
 main()
   .catch((e) => {
-    console.error('Seed failed:', e);
+    logger.error('Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
-    console.log('Seeding finished.');
+    logger.log('Seeding finished.');
   });
 
 // npx node prisma/seed.ts

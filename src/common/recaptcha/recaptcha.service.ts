@@ -1,18 +1,18 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RecaptchaService {
   private readonly secretKey: string;
-
+  logger: Logger;
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     this.secretKey = this.configService.get<string>('RECAPTCHA_SECRET');
-    console.log('Using reCAPTCHA secret:', this.secretKey);
+    this.logger = new Logger('RecaptchaService LOGGER');
   }
 
   async validate(token: string): Promise<boolean> {
@@ -30,7 +30,7 @@ export class RecaptchaService {
         }),
       );
 
-      console.log('reCAPTCHA verify payload:', {
+      this.logger.log('reCAPTCHA verify payload:', {
         success: data?.success,
         'error-codes': data?.['error-codes'],
         hostname: data?.hostname,
@@ -45,7 +45,7 @@ export class RecaptchaService {
       }
       return true;
     } catch (err) {
-      console.error('reCAPTCHA verification error:', err?.message || err);
+      this.logger.log('reCAPTCHA verification error:', err?.message || err);
       throw new UnauthorizedException('Failed to verify reCAPTCHA');
     }
   }
