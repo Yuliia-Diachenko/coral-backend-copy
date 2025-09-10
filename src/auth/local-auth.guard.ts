@@ -3,14 +3,17 @@ import {
   ExecutionContext,
   UnauthorizedException,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecaptchaService } from '../common/recaptcha/recaptcha.service';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
+  logger: Logger;
   constructor(private readonly recaptchaService: RecaptchaService) {
     super();
+    this.logger = new Logger('LocalAuthGuard LOGGER');
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -24,7 +27,10 @@ export class LocalAuthGuard extends AuthGuard('local') {
     try {
       await this.recaptchaService.validate(recaptchaToken);
     } catch (error) {
-      console.error('Recaptcha validation failed:', error?.message || error);
+      this.logger.error(
+        'Recaptcha validation failed:',
+        error?.message || error,
+      );
       throw new ForbiddenException('Invalid reCAPTCHA token');
     }
 
@@ -35,7 +41,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
       }
       return can;
     } catch (err) {
-      console.error('LocalAuthGuard error:', err?.message || err);
+      this.logger.error('LocalAuthGuard error:', err?.message || err);
       throw new UnauthorizedException('Invalid email or password');
     }
   }

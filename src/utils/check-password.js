@@ -1,11 +1,14 @@
 import * as bcrypt from 'bcrypt';
+import { Logger } from '@nestjs/common';
 
 const hash = '$2b$10$VzEKztgl.3xdtQXclZAqrOyqAISDqAuXWv.iMIWAJjJjYJ32fbzQS';
 const passwordToCheck = 'test1234';
 
+const logger = new Logger('Prisma LOGGER');
+
 async function check() {
   const match = await bcrypt.compare(passwordToCheck, hash);
-  console.log(match ? 'Пароль співпадає!' : 'Пароль НЕ співпадає.');
+  logger.log(match ? 'Password matches!' : 'Password NOT matches!');
 }
 
 check();
