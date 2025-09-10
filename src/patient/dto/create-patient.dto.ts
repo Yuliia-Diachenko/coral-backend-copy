@@ -10,9 +10,9 @@ export class CreatePatientDto {
   @IsString()
   lastName: string;
 
-  // @IsOptional()
-  // @IsString()
-  // phone?: string;
+  @IsOptional()
+  @IsString()
+  phone?: string;
 
   // @IsOptional()
   // dateOfBirth?: string;
