@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import * as bcrypt from 'bcryptjs';
 import { PostmarkService } from '../../postmark/postmark.service';
+import * as XLSX from 'xlsx';
 
 @Injectable()
 export class PatientsService {
@@ -11,12 +12,13 @@ export class PatientsService {
     private postmark: PostmarkService,
   ) {}
 
+  /**
+   * Create a single patient in the database
+   */
   async createPatient(dto: CreatePatientDto) {
-    // Step 1: generate temporary password
     const tempPassword = Math.random().toString(36).slice(-8);
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    // Step 2: create patient in database
     const patient = await this.prisma.user.create({
       data: {
         email: dto.email,
@@ -31,11 +33,61 @@ export class PatientsService {
       },
     });
 
-    // Step 3: send email only if inviteOption === 'invite'
     if (dto.inviteOption === 'invite') {
       await this.postmark.sendPatientInvite(dto.email, tempPassword);
     }
 
     return { id: patient.id, email: patient.email };
+  }
+
+  /**
+   * Import patients from uploaded Excel (.xlsx) file
+   */
+  async importPatients(file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    try {
+      // Reading Excel file
+      const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Converting a letter to JSON
+      const rows: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+      const results = [];
+
+      for (const row of rows) {
+        const dto: CreatePatientDto = {
+          email: row.email,
+          firstName: row.firstName || null,
+          lastName: row.lastName || null,
+          phone: row.phoneNumber || null,
+          inviteOption: 'invite',
+        };
+
+        try {
+          const created = await this.createPatient(dto);
+          results.push({ email: dto.email, status: 'created', id: created.id });
+        } catch (err) {
+          results.push({
+            email: dto.email,
+            status: 'error',
+            error: err.message,
+          });
+        }
+      }
+
+      return {
+        imported: results.length,
+        results,
+      };
+    } catch (err) {
+      throw new BadRequestException(
+        `Failed to parse Excel file: ${err.message}`,
+      );
+    }
   }
 }
