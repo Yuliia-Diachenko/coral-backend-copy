@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install
-
-RUN npx prisma generate
+RUN npm install --immutable
 
 RUN npm run build
+
+RUN npx prisma generate
 
 EXPOSE ${PORT}
 
