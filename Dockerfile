@@ -9,7 +9,6 @@ RUN npm install --immutable
 RUN npm run build
 
 RUN npx prisma generate
-RUN npx node prisma/seed.ts
 
 EXPOSE ${PORT}
 
