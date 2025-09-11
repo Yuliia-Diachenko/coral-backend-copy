@@ -67,6 +67,7 @@ async function bootstrap() {
       'http://localhost:3000/provider-account/',
     ],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
   app.use(cookieParser());
   const port = process.env.PORT || 5000;

@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
   Req,
   Res,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -36,6 +37,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       domain: '.coralscript.com',
+      // domain: undefined,
       sameSite: 'lax',
       maxAge: 15 * 60 * 1000, // 15 min
     });
@@ -60,5 +62,11 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token');
     return { message: 'Logged out successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@Req() req) {
+    return req.user;
   }
 }
