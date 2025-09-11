@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtCookieGuard } from '../common/guards/jwt-cookie.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -55,10 +55,15 @@ export class AuthController {
     return { message: 'Password has been reset successfully.' };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtCookieGuard)
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('access_token');
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: '.coralscript.com',
+      sameSite: 'lax',
+    });
     return { message: 'Logged out successfully' };
   }
 }

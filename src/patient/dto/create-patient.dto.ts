@@ -4,15 +4,16 @@ export class CreatePatientDto {
   @IsEmail()
   email: string;
 
+  @IsOptional()
   @IsString()
   firstName: string;
 
   @IsString()
   lastName: string;
 
-  // @IsOptional()
-  // @IsString()
-  // phone?: string;
+  @IsOptional()
+  @IsString()
+  phone?: string;
 
   // @IsOptional()
   // dateOfBirth?: string;

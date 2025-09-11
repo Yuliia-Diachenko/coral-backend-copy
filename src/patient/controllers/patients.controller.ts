@@ -14,7 +14,7 @@ import { PatientsService } from '../servises/patients.service';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import { Roles } from '../../auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { RolesGuard } from '../../auth/roles.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @Controller('patients')
 @UseGuards(RolesGuard)
