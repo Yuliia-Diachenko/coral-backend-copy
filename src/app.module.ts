@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
 import { NotificationsModule } from './notifications/notifications.module';
 import { LoggingModule } from './logging/logging.module';
+import { PostmarkModule } from './postmark/postmark.module';
+import { PatientsModule } from './patient/patients.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { LoggingModule } from './logging/logging.module';
     AuthModule,
     NotificationsModule,
     LoggingModule,
+    PostmarkModule,
+    PatientsModule,
   ],
   controllers: [AppController],
   providers: [MailService],

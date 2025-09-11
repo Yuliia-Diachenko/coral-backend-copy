@@ -7,19 +7,34 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  // Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PatientsService } from '../servises/patients.service';
-import { CreatePatientDto } from '../dto/create-patient.dto';
-import { Roles } from '../../auth/roles.decorator';
+import { PatientsService } from './patients.service';
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { Roles } from 'src/auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { RolesGuard } from '../../auth/roles.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('patients')
 @UseGuards(RolesGuard)
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
+
+  // @Get()
+  // @Roles(Role.ADMIN, Role.PROVIDER)
+  // async list(
+  //   @Query('name') name?: string,
+  //   @Query('page') page = '1',
+  //   @Query('pageSize') pageSize = '20',
+  // ) {
+  //   return this.patientsService.listPatients({
+  //     name,
+  //     page: Number(page) || 1,
+  //     pageSize: Number(pageSize) || 20,
+  //   });
+  // }
 
   @Post()
   @Roles(Role.ADMIN, Role.PROVIDER)
