@@ -1,9 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreatePatientDto } from '../dto/create-patient.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreatePatientDto } from './dto/create-patient.dto';
 import * as bcrypt from 'bcryptjs';
-import { PostmarkService } from '../../postmark/postmark.service';
+import { PostmarkService } from 'src/postmark/postmark.service';
 import * as XLSX from 'xlsx';
+// import { Prisma, Role } from '@prisma/client';
 
 @Injectable()
 export class PatientsService {
@@ -90,4 +91,44 @@ export class PatientsService {
       );
     }
   }
+
+  // async listPatients(params: {
+  //   name?: string;
+  //   page?: number;
+  //   pageSize?: number;
+  // }) {
+  //   const { name, page = 1, pageSize = 20 } = params;
+
+  //   const where: Prisma.UserWhereInput = {
+  //     role: Role.PATIENT,
+  //   };
+
+  //   if (name && name.trim()) {
+  //     where.OR = [
+  //       { firstName: { contains: name, mode: Prisma.QueryMode.insensitive } },
+  //       { lastName: { contains: name, mode: Prisma.QueryMode.insensitive } },
+  //       { email: { contains: name, mode: Prisma.QueryMode.insensitive } },
+  //       // { phone: { contains: name, mode: Prisma.QueryMode.insensitive } },
+  //     ];
+  //   }
+
+  //   const [items, total] = await this.prisma.$transaction([
+  //     this.prisma.user.findMany({
+  //       where,
+  //       orderBy: { createdAt: 'desc' },
+  //       skip: (page - 1) * pageSize,
+  //       take: pageSize,
+  //       select: {
+  //         id: true,
+  //         firstName: true,
+  //         lastName: true,
+  //         email: true,
+  //         // phone: true,
+  //       },
+  //     }),
+  //     this.prisma.user.count({ where }),
+  //   ]);
+
+  //   return { items, total, page, pageSize };
+  // }
 }

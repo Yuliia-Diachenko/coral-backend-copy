@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: coral
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - coral-db-data:/var/lib/postgresql/data
 
@@ -21,9 +21,8 @@ services:
       DATABASE_URL: postgresql://postgres:123456@postgres:5432/coral
       NODE_ENV: production
     ports:
-      - "3000:3000"
+      - '3000:3000'
     command: node dist/main
 
 volumes:
   coral-db-data:
-
