@@ -14,15 +14,14 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFilterDto } from './dto/user-filter.dto';
-// import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
-import { BackendApiGuard } from '../common/guards/backend-api.guard';
+// import { BackendApiGuard } from '../common/guards/backend-api.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('users')
-// @UseGuards(JwtAuthGuard, RolesGuard)
-@UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN, Role.PROVIDER) // Only ADMIN and PROVIDER allowed
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -52,9 +51,10 @@ export class UserController {
     return this.userService.remove(id, req.user.role);
   }
 }
-
 @Controller('internal/users')
 // @UseGuards(BackendApiGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.PROVIDER)
 export class InternalUserController {
   constructor(private readonly userService: UserService) {}
 
