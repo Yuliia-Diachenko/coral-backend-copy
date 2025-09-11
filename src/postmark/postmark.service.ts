@@ -6,7 +6,7 @@ export class PostmarkService {
   private client: postmark.ServerClient;
 
   constructor() {
-    this.client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
+    this.client = new postmark.ServerClient(process.env.POSTMARK_TOKEN);
   }
 
   async sendPatientInvite(email: string, tempPassword: string) {
