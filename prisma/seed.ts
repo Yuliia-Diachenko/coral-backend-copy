@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, Status } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { Logger } from '@nestjs/common';
@@ -13,26 +13,83 @@ async function main() {
 
   // --- USERS ---
   const users = [
-    { email: 'zirkanew82@gmail.com', role: 'ADMIN' },
-    { email: 'podolyak365@gmail.com', role: 'ADMIN' },
-    { email: 'glebkirsenko@gmail.com', role: 'ADMIN' },
-    { email: 'kobzar.anatolii.vl@gmail.com', role: 'ADMIN' },
-    { email: 'team@huntressdigital.com', role: 'ADMIN' },
-    { email: 'provider1@example.com', role: 'PROVIDER' },
-    { email: 'provider2@example.com', role: 'PROVIDER' },
-    { email: 'provider3@example.com', role: 'PROVIDER' },
-    { email: 'patient1@example.com', role: 'PATIENT' },
-    { email: 'patient2@example.com', role: 'PATIENT' },
+    {
+      email: 'zirkanew82@gmail.com',
+      role: 'ADMIN',
+      discount: 20,
+      firstName: 'Yulia',
+    },
+    {
+      email: 'podolyak365@gmail.com',
+      role: 'ADMIN',
+      discount: 20,
+      firstName: 'Olena',
+    },
+    {
+      email: 'glebkirsenko@gmail.com',
+      role: 'ADMIN',
+      discount: 20,
+      firstName: 'Gleb',
+    },
+    {
+      email: 'kobzar.anatolii.vl@gmail.com',
+      role: 'ADMIN',
+      discount: 20,
+      firstName: 'Anatolii',
+    },
+    {
+      email: 'team@huntressdigital.com',
+      role: 'ADMIN',
+      discount: 20,
+      firstName: 'Team',
+    },
+    {
+      email: 'provider1@example.com',
+      role: 'PROVIDER',
+      discount: 20,
+      firstName: 'Provider1',
+    },
+    {
+      email: 'provider2@example.com',
+      role: 'PROVIDER',
+      discount: 20,
+      firstName: 'Provider2',
+    },
+    {
+      email: 'provider3@example.com',
+      role: 'PROVIDER',
+      discount: 20,
+      firstName: 'Provider3',
+    },
+    {
+      email: 'patient1@example.com',
+      role: 'PATIENT',
+      discount: 20,
+      firstName: 'Patient1',
+    },
+    {
+      email: 'patient2@example.com',
+      role: 'PATIENT',
+      discount: 20,
+      firstName: 'Patient2',
+    },
   ];
 
   for (const u of users) {
     await prisma.user.upsert({
       where: { email: u.email },
-      update: {},
+      update: {
+        firstName: u.firstName,
+        discount: u.discount,
+        status: Status.NEVER_SIGNED_IN,
+      },
       create: {
         email: u.email,
         password: hashedPassword,
         role: u.role as any,
+        discount: u.discount,
+        firstName: u.firstName,
+        status: Status.NEVER_SIGNED_IN,
       },
     });
     logger.log(`User ${u.email} created or exists`);
