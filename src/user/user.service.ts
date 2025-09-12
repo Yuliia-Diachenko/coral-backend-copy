@@ -63,18 +63,7 @@ export class UserService {
     if (filter.lastName)
       where.lastName = { contains: filter.lastName, mode: 'insensitive' };
 
-    // return this.prisma.user.findMany({ where });
-    return this.prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-      },
-    });
+    return this.prisma.user.findMany({ where });
   }
 
   async findOne(id: string, requesterRole: Role) {

@@ -18,5 +18,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "typeRoots": ["./types", "./node_modules/@types"]
-  }
+  },
+  "include": ["src/**/*", "prisma/seed.ts"]
 }
