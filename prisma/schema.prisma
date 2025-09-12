@@ -7,19 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  NEVER_SIGNED_IN
+  NO_PURCHASE
+  NOT_ACTIVE
+  ACTIVE
+}
+
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
-  firstName   String?
-  lastName    String?
-  role        Role     @default(PROVIDER)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role     @default(PROVIDER)
+  createdAt DateTime @default(now())
 
   phone       String?
   dateOfBirth DateTime?
   gender      String?
   discount    Int?
+  status      Status?   @default(NEVER_SIGNED_IN)
 
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
@@ -80,4 +88,3 @@ enum NotificationType {
 }
 
 // update file
-
