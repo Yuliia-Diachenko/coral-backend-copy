@@ -3,3 +3,5 @@ dist/
 .env
 README.md
 /generated/prisma
+logs
+env.txt

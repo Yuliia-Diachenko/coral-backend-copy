@@ -14,9 +14,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFilterDto } from './dto/user-filter.dto';
+
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { BackendApiGuard } from '../common/guards/backend-api.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
 
@@ -51,18 +51,20 @@ export class UserController {
     return this.userService.remove(id, req.user.role);
   }
 }
+
 @Controller('internal/users')
-@UseGuards(BackendApiGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN) // Only ADMIN allowed for internal API
 export class InternalUserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async findAllInternal(@Query() filter: UserFilterDto) {
-    return this.userService.findAll(filter, 'ADMIN');
+  async findAllInternal(@Query() filter: UserFilterDto, @Request() req) {
+    return this.userService.findAll(filter, req.user.role);
   }
 
   @Post()
-  async createInternal(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto, 'ADMIN');
+  async createInternal(@Body() dto: CreateUserDto, @Request() req) {
+    return this.userService.create(dto, req.user.role);
   }
 }
