@@ -21,8 +21,15 @@ model User {
   gender      String?
   discount    Int?
 
+  inviteOption InviteOption @default(INVITE) 
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
+}
+
+
+enum InviteOption {
+  INVITE
+  NO_EMAIL
 }
 
 model PasswordResetToken {
