@@ -8,22 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  firstName String?
-  lastName  String?
-  role      Role     @default(PROVIDER)
-  createdAt DateTime @default(now())
-
-  phone       String?
-  dateOfBirth DateTime?
-  gender      String?
-  discount    Int?
-  status      Status?   @default(ACTIVE)
-
-  inviteOption InviteOption @default(INVITE) 
-  notifications       Notification[]
+  id            String        @id @default(uuid())
+  email         String        @unique
+  password      String
+  firstName     String?
+  lastName      String?
+  role          Role          @default(PROVIDER)
+  createdAt     DateTime      @default(now())
+  phone         String?
+  dateOfBirth   DateTime?
+  gender        String?
+  discount      Int?
+  status        Status?       @default(ACTIVE)
+  inviteOption  InviteOption  @default(INVITE)
+  refreshToken  String?       // <- for refresh token
+  notifications Notification[]
   passwordResetTokens PasswordResetToken[]
 }
 enum Status {
