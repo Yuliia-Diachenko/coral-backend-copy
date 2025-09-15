@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 import { RecaptchaModule } from '../common/recaptcha/recaptcha.module';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { MailService } from '../mail/mail.service';
 
 @Module({

@@ -25,7 +25,7 @@ export class PatientsService {
         email: dto.email,
         firstName: dto.firstName,
         lastName: dto.lastName,
-        // phone: dto.phone,
+        phone: dto.phone,
         // dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : null,
         // gender: dto.gender,
         // discount: dto.discount,
@@ -65,7 +65,7 @@ export class PatientsService {
           email: row.email,
           firstName: row.firstName || null,
           lastName: row.lastName || null,
-          phone: row.phoneNumber || null,
+          // phone: row.phoneNumber || null,
           inviteOption: 'invite',
         };
 
