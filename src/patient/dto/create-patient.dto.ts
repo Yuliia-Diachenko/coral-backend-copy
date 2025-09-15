@@ -1,9 +1,10 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsEnum } from 'class-validator';
 
 export class CreatePatientDto {
   @IsEmail()
   email: string;
 
+  @IsOptional()
   @IsString()
   firstName: string;
 
@@ -14,13 +15,12 @@ export class CreatePatientDto {
   @IsString()
   phone?: string;
 
-  // @IsOptional()
-  // dateOfBirth?: string;
-
-  // @IsOptional()
-  // gender?: string;
-
   @IsOptional()
   discount?: number;
+
+  @IsOptional()
+  @IsEnum(['invite', 'noEmail'], {
+    message: 'inviteOption must be either "invite" or "noEmail"',
+  })
   inviteOption?: 'invite' | 'noEmail';
 }
