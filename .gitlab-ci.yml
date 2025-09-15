@@ -12,6 +12,18 @@ variables:
 .release:
   script:
     - docker build -t $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE .
+    - docker run --rm --network coral-network --env-file .env \
+        --entrypoint npx $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE \
+        prisma migrate resolve --rolled-back 20250914105301_add_refresh_token_to_user || true
+
+    - |
+      docker run -i --rm --network coral-network --env-file .env \
+        --entrypoint npx $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE \
+        prisma db execute --stdin <<'SQL'
+      UPDATE "public"."User"
+      SET "status" = 'INACTIVE'
+      WHERE "status" IN ('NEVER_SIGNED_IN','NO_PURCHASE','NOT_ACTIVE');
+      SQL
     - docker run --rm --network coral-network --env-file .env --entrypoint npx $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE prisma migrate deploy
     - docker run --rm --network coral-network --env-file .env --entrypoint npx $BACKEND_CONTAINER_NAME:$BUILD_TAG_BASE prisma db seed
     - docker stop $BACKEND_CONTAINER_NAME || true
