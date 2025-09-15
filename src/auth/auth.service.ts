@@ -15,6 +15,7 @@ export class AuthService {
     private mailService: MailService,
   ) {
     this.logger = new Logger('Auth LOGGER');
+    this.logger.log('JWT_REFRESH_SECRET:', process.env.JWT_REFRESH_SECRET);
   }
 
   async validateUser(email: string, password: string) {
