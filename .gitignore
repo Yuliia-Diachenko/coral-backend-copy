@@ -5,3 +5,6 @@ README.md
 /generated/prisma
 logs
 env.txt
+*.log
+undefined/
+*.audit.json

@@ -1,4 +1,3 @@
-// auth.controller.ts
 import {
   Controller,
   Post,
@@ -11,10 +10,11 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtCookieGuard } from '../common/guards/jwt-cookie.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -31,18 +31,51 @@ export class AuthController {
       );
     }
 
-    const { accessToken } = await this.authService.login(user);
+    const { accessToken, refreshToken } = await this.authService.login(user);
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       domain: '.coralscript.com',
-      // domain: undefined,
       sameSite: 'lax',
       maxAge: 15 * 60 * 1000, // 15 min
     });
 
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: '.coralscript.com',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     return { role: user.role, accessToken };
+  }
+
+  @Post('refresh')
+  async refresh(
+    @Body('refreshToken') refreshToken: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.authService.refreshToken(refreshToken);
+
+    res.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: '.coralscript.com',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: '.coralscript.com',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return tokens;
   }
 
   @Post('request-password-reset')
@@ -57,10 +90,24 @@ export class AuthController {
     return { message: 'Password has been reset successfully.' };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtCookieGuard)
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('access_token');
+  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(req.user.id);
+
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: '.coralscript.com',
+      sameSite: 'lax',
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: '.coralscript.com',
+      sameSite: 'lax',
+    });
+
     return { message: 'Logged out successfully' };
   }
 
