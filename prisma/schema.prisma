@@ -26,8 +26,11 @@ model User {
   passwordResetTokens PasswordResetToken[]
 }
 enum Status {
-  ACTIVE
-  INACTIVE
+ NEVER_SIGNED_IN
+ NO_PURCHASE
+ NOT_ACTIVE
+ ACTIVE
+ INACTIVE
 }
 enum InviteOption {
   INVITE
