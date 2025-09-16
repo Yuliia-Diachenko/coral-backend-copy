@@ -9,14 +9,18 @@ import * as bcrypt from 'bcrypt';
 import { UserFilterDto } from './dto/user-filter.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PostmarkService } from '../postmark/postmark.service';
 
 @Injectable()
+@Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private postmarkService: PostmarkService,
+  ) {}
 
   // Create user with role-based restrictions
   async create(data: CreateUserDto, requesterRole: Role) {
-    // Providers can create only PATIENT users
     if (
       requesterRole === Role.PROVIDER &&
       data.role &&
@@ -25,18 +29,22 @@ export class UserService {
       throw new ForbiddenException('Providers can only create patients');
     }
 
-    // Providers can't assign role other than PATIENT
     if (requesterRole === Role.PROVIDER) {
       data.role = Role.PATIENT;
     }
 
     const hashed = await bcrypt.hash(data.password, 10);
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: { ...data, password: hashed },
     });
-  }
 
+    if (user.role === Role.PATIENT) {
+      await this.postmarkService.sendPatientInvite(user.email, data.password);
+    }
+
+    return user;
+  }
   // Find users with filtering and role-based access control
   async findAll(filter: UserFilterDto, requesterRole: Role) {
     const where: Prisma.UserWhereInput = {};

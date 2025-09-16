@@ -11,7 +11,7 @@ export class PostmarkService {
 
   async sendPatientInvite(email: string, tempPassword: string) {
     await this.client.sendEmail({
-      From: 'no-reply@coralscript.com',
+      From: 'admin@pearlgpo.com',
       To: email,
       Subject: 'Welcome to Coral!',
       TextBody: `Your account has been created. 
