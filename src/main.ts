@@ -61,6 +61,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      'http://localhost:3001',
       'https://coral-frontend-u7qi.vercel.app',
       'https://coralscript.com',
       'https://coralscript.com/provider-account',

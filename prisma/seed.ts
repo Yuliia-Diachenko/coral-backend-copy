@@ -20,30 +20,6 @@ async function main() {
       firstName: 'Yulia',
     },
     {
-      email: 'podolyak365@gmail.com',
-      role: 'ADMIN',
-      discount: 20,
-      firstName: 'Olena',
-    },
-    {
-      email: 'glebkirsenko@gmail.com',
-      role: 'ADMIN',
-      discount: 20,
-      firstName: 'Gleb',
-    },
-    {
-      email: 'kobzar.anatolii.vl@gmail.com',
-      role: 'ADMIN',
-      discount: 20,
-      firstName: 'Anatolii',
-    },
-    {
-      email: 'team@huntressdigital.com',
-      role: 'ADMIN',
-      discount: 20,
-      firstName: 'Team',
-    },
-    {
       email: 'provider1@example.com',
       role: 'PROVIDER',
       discount: 20,

@@ -19,7 +19,8 @@
     "seed": "ts-node prisma/seed.ts",
     "lint": "eslint \"src/**/*.{ts,js}\" --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
-    "test:ci": "node --max-old-space-size=4096 node_modules/.bin/jest --runInBand"
+    "test:ci": "node --max-old-space-size=4096 node_modules/.bin/jest --runInBand",
+    "migration:run": "npx prisma migrate deploy"
   },
   "prisma": {
     "seed": "node dist/prisma/seed.js"
